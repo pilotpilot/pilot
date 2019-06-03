@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* {
+font-size: 12px;
+}
+
+div{
+border: 1px solid #cccccc;
+background-color: #eeeeee;
+padding: 5px;
+}
+
+.but{
+border: 1px solid #cccccc;
+background-color: #eee;
+padding: 2px;
+cursor: pointer;
+}
+</style>
+<meta charset="utf-8" />
+
+<script>
+
+var sampleCount=209;
+var positiveCount=92;
+var negativeCount=sampleCount - positiveCount;
+var s=new Array();
+
+/*Filling the sample array...
+each row will contain unique (attribute/value) pair and the count of infected and uninfected people
+*/
+s = [
+	['age', 'very_low', 4, 10],
+	['age', 'low', 14, 36],
+	['age', 'normal', 30, 28],
+	['age', 'high', 36, 35],
+	['age', 'very_high', 30, 28],
+	['dbp', 'very_low', 10, 13],
+	['dbp', 'low', 36, 58],
+	['dbp', 'normal', 41, 43],
+	['dbp', 'high', 3, 1],
+	['dbp', 'very_high', 2, 2],
+	['hbp', 'very_low', 17, 6],
+	['hbp', 'low', 24, 16],
+	['hbp', 'normal', 30, 37],
+	['hbp', 'high', 15, 33],
+	['hbp', 'very_high', 6, 25],
+	['cpt', 'asympt', 75, 37],
+	['cpt', 'non_angina', 7, 29],
+	['cpt', 'atyp_angina', 6, 59],
+	['cpt', 'typ_angina', 4, 2],
+	['pws', 'yes', 60, 12],
+	['pws', 'no', 32, 105],
+	['ha', 'normal', 73, 100],
+	['ha', 'left_vent_hyper', 1, 4],
+	['ha', 'st_t_wave_abnormality', 17, 13],
+	['bs', 'true', 11, 5],
+	['bs', 'false', 81, 112]
+	];
+
+//A function to get the count of a given class according to a given attribute/value...
+function getCount(a, v, c){
+	var i=0;
+	while(s[i]){
+		te = s[i];
+		if(te[0] == a && te[1] == v){
+			return te[c];
+		}
+	i++;
+	}
+	return "Attribute/Value not found...";
+}
+
+// A function to calculate the likelihood of a new object over a given class...
+function likelihood(o, c){
+	var k, d, prob=1;
+	if(c == 2){
+		d = positiveCount;
+	}else{
+		d = negativeCount;
+	}
+	for(k in o){
+		prob *= getCount(k, o[k], c)/d;
+	}
+	if(c == 2){
+		prob *= positiveCount/sampleCount;
+	}else{
+		prob *= negativeCount/sampleCount;
+	}
+	return prob;
+}
+
+//A function to classify object o...
+function classify(o){
+	var pp, pn, ppm, pnm;
+	ppm = likelihood(o, 2);
+	pnm = likelihood(o, 3);
+	pp = ppm/(ppm+pnm);
+	pn = pnm/(ppm+pnm);
+	
+	if(pp>pn){
+		return pp +    '------I think it is: Positive';
+		
+
+	}else if(pn>pp){
+		return pn+     '------I think it is: Negative';
+	}else{
+		return 'I cant\'t decide, both probilities are equal...';
+	}
+}
+
+function classObject(){
+	var o = new Object();
+	var chs = document.getElementsByTagName('input');
+	for(var i=0; i <= chs.length-1; i++){
+		if(chs[i].type == 'radio' && chs[i].checked){
+		chk = chs[i].name + 'In';
+		if(document.getElementById(chk).checked){
+			var prty=chs[i].name;
+			o[prty] = chs[i].value;
+		}
+		}
+	}
+
+document.getElementById('result').innerText =classify(o);
+
+}
+</script>
+
+</head>
+
+<body>
+
+<div>
+<input type="checkbox" id="ageIn" checked>Check if Age is given<br>
+<input type="radio" name="age" value="very_low" checked>Very low between (28-35)<br>
+<input type="radio" name="age" value="low" >Low between (36-43)<br>
+<input type="radio" name="age" value="normal">Normal between (44-50)<br>
+<input type="radio" name="age" value="high" >High between (51-58)<br>
+<input type="radio" name="age" value="very_high">Very High between (59-66)
+</div><br>
+
+<div>
+<input type="checkbox" id="dbpIn" checked>Check if Rest_blood_pressure is given<br>
+<input type="radio" name="dbp" value="very_low" checked>Very low between (92-113)<br>
+<input type="radio" name="dbp" value="low">Low between (114-135)<br>
+<input type="radio" name="dbp" value="normal">Normal between (136-165)<br>
+<input type="radio" name="dbp" value="high">High between (166-178)<br>
+<input type="radio" name="dbp" value="very_high">Very High between (179-200)<br>
+</div><br>
+
+<div>
+<input type="checkbox" id="hbpIn" checked>Check if Max_heart_rate	 is given<br>
+<input type="radio" name="hbp" value="very_low" checked>Very Low between (82-103(<br>
+<input type="radio" name="hbp" value="low" >Low between (104-124)<br>
+<input type="radio" name="hbp" value="normal" >Normal between (125-145)<br>
+<input type="radio" name="hbp" value="high" >High between (146-166)<br>
+<input type="radio" name="hbp" value="very_high" >Very High between (167-188)<br>
+</div>
+
+<div>
+<input type="checkbox" id="cptIn" checked>Check if Chest_pain_type is given<br>
+<input type="radio" name="cpt" value="asympt" checked>Asympt<br>
+<input type="radio" name="cpt" value="non_angina">Non_angina<br>
+<input type="radio" name="cpt" value="atyp_angina">Atyp_angina<br>
+<input type="radio" name="cpt" value="typ_angina">Typ_angina
+</div>
+
+<div>
+<input type="checkbox" id="pwsIn" checked>Check if Exercice_angina is given<br>
+<input type="radio" name="pws" value="yes" checked>yes<br>
+<input type="radio" name="pws" value="no">No<br>
+</div>
+
+<div>
+<input type="checkbox" id="haIn" checked>Check if Rest_electro is given<br>
+<input type="radio" name="ha" value="normal" checked>Normal<br>
+<input type="radio" name="ha" value="left_vent_hyper" >Left Vent Hyper<br>
+<input type="radio" name="ha" value="st_t_wave_abnormality" >St T Wave Abnormality<br>
+</div>
+
+<div>
+<input type="checkbox" id="bsIn" checked>Check if Blood_sugar is given<br>
+<input type="radio" name="bs" value="true" checked>True<br>
+<input type="radio" name="bs" value="false" >False<br>
+</div>
+
+<br><br>
+
+<input type="button" class="but" onclick="classObject();" value="Class this object">
+
+<p id="result">Here where result comes...</p>
+
+</body>
+</html>
